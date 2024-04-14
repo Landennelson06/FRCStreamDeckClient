@@ -27,3 +27,7 @@ If I happen to do this, and you're unable to use a build, you need to modify the
 ### Help! The code is ugly, what is the stack?
 
 The stack is the [python-elgato-streamdeck](https://github.com/abcminiuser/python-elgato-streamdeck) library, which takes the images in the assets folder and assigns them. The code then reaches out over networktables, specifically on the `StreamDeckData` table, and publishes data to the `true` publisher. Key info starts at 1, not zero, as the easiest way for me to publish the key info was to have 0 be disabled. 
+
+### I want to build the application myself
+
+Great! Here's an install line for all the dependencies `pip3 install pyntcore streamdeck pillow`
