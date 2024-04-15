@@ -1,4 +1,4 @@
-import ntcore
+from ntcore import NetworkTableInstance,_logutil
 import yaml
 from StreamDeck.DeviceManager import DeviceManager
 from tkinter import *
@@ -27,8 +27,9 @@ class updateVars(Thread):
                 else:
                     isConnSD.set("No Deck Connected")
             except Exception as e:
-                messagebox.showerror("Error!", "Uh Oh! An error occurred: \n" + str(e))
-                on_closing()
+                if "main thread is not in" not in str(e):
+                    messagebox.showerror("Error!", "Uh Oh! An error occurred: \n" + str(e))
+                    on_closing()
 
 
 
@@ -120,7 +121,7 @@ if __name__ == '__main__':
     # When this module is run (not imported) then create the app, the
     # frame, show it, and start the event loop.
     global inst
-    inst = ntcore.NetworkTableInstance.getDefault()
+    inst = NetworkTableInstance.getDefault()
     table = inst.getTable("StreamDeckData")
     global trueTopic
     trueTopic = table.getIntegerTopic("true")
@@ -132,6 +133,11 @@ if __name__ == '__main__':
     root.title("FRC Stream Deck Client")
     # Set geometry (widthxheight)
     root.geometry('350x200')
+    try:
+        root.iconbitmap("ico/FRCStreamDeckIcon.ico")
+    except:
+        root.iconbitmap("_internal/ico/FRCStreamDeckIcon.ico")
+    # No idea why this is needed, but it works 
 
     global isConn
     isConn = StringVar(root, "Hello Everyone!!")
