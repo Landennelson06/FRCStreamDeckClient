@@ -9,7 +9,8 @@ from StreamDeck.ImageHelpers import PILHelper
 from PIL import Image, ImageDraw, ImageFont
 import psutil 
 ASSETS_PATH = os.path.join(os.path.dirname(__file__), "assets")
-
+ICON_PATH = os.path.join(os.path.dirname(__file__), "ico")
+VERSON_NO = "0.15a"
 class updateVars(Thread):
     def __init__(self, event):
         Thread.__init__(self)
@@ -17,12 +18,16 @@ class updateVars(Thread):
 
     def run(self):
         while not self.stopped.wait(0.1):
+            global deckConnect
+            if(len(DeviceManager().enumerate()) != deckConnect):
+                    loadStreamDeck()
+                    deckConnect = len(DeviceManager().enumerate())    
             checkStreamDeck()
             if(inst.isConnected()):
                 isConn.set("Connected to bot") 
             else:
                 isConn.set("Disconnected from bot")   
-            try:    
+            try:
                 if(len(DeviceManager().enumerate()) >0):
                     isConnSD.set("Deck Connected")
                 else:
@@ -34,7 +39,29 @@ class updateVars(Thread):
 def checkStreamDeck():
     if("StreamDeck.exe" in (i.name() for i in psutil.process_iter())):
             messagebox.showerror("Error!", "Close StreamDeck Before Use")
+def loadStreamDeck():
+    streamdecks = DeviceManager().enumerate()
+    for index, deck in enumerate(streamdecks):
+        # This example only works with devices that have screens.
+        if not deck.is_visual():
+            continue
 
+        deck.open()
+        deck.reset()
+
+        # print("Opened '{}' device (serial number: '{}', fw: '{}')".format(
+        #     deck.deck_type(), deck.get_serial_number(), deck.get_firmware_version()
+        # ))
+
+        # Set initial screen brightness to 30%.
+        deck.set_brightness(30)
+
+        # Set initial key images.
+        for key in range(deck.key_count()):
+            update_key_image(deck, key, False)
+
+        # Register callback function for when a key state changes.
+        deck.set_key_callback(key_change_callback)
 
 # Generates a custom tile with run-time generated text and custom image via the
 # PIL module.
@@ -99,28 +126,6 @@ def on_closing():
 root = Tk()
 root.protocol("WM_DELETE_WINDOW", on_closing)
 if __name__ == '__main__':
-    streamdecks = DeviceManager().enumerate()
-    for index, deck in enumerate(streamdecks):
-        # This example only works with devices that have screens.
-        if not deck.is_visual():
-            continue
-
-        deck.open()
-        deck.reset()
-
-        # print("Opened '{}' device (serial number: '{}', fw: '{}')".format(
-        #     deck.deck_type(), deck.get_serial_number(), deck.get_firmware_version()
-        # ))
-
-        # Set initial screen brightness to 30%.
-        deck.set_brightness(30)
-
-        # Set initial key images.
-        for key in range(deck.key_count()):
-            update_key_image(deck, key, False)
-
-        # Register callback function for when a key state changes.
-        deck.set_key_callback(key_change_callback)
     # When this module is run (not imported) then create the app, the
     # frame, show it, and start the event loop.
     global inst
@@ -136,23 +141,24 @@ if __name__ == '__main__':
     root.title("FRC Stream Deck Client")
     # Set geometry (widthxheight)
     root.geometry('350x200')
-    try:
-        root.iconbitmap("ico/FRCStreamDeckIcon.ico")
-    except:
-        root.iconbitmap("_internal/ico/FRCStreamDeckIcon.ico")
-    # No idea why this is needed, but it works 
+    root.iconbitmap(os.path.join(ICON_PATH, "FRCStreamDeckIcon.ico"))
 
+    global deckConnect
+    deckConnect = 0
     global isConn
-    isConn = StringVar(root, "Hello Everyone!!")
+    isConn = StringVar(root, "Loading...")
  
     isConnLabel = Label(root, textvariable=isConn)
     isConnLabel.pack()
     
     global isConnSD
-    isConnSD = StringVar(root, "Hello Everyone!!")
+    isConnSD = StringVar(root, "Loading...")
  
     isConnSDLabel = Label(root, textvariable=isConnSD)
     isConnSDLabel.pack()
+
+    verLabel = Label(root, text=VERSON_NO)
+    verLabel.place(x=350, y=200,anchor=SE)
 
     # all widgets will be here
     # Execute Tkinter
