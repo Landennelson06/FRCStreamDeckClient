@@ -7,7 +7,7 @@ from tkinter import messagebox
 import os
 from StreamDeck.ImageHelpers import PILHelper
 from PIL import Image, ImageDraw, ImageFont
-
+import psutil 
 ASSETS_PATH = os.path.join(os.path.dirname(__file__), "assets")
 
 class updateVars(Thread):
@@ -17,6 +17,7 @@ class updateVars(Thread):
 
     def run(self):
         while not self.stopped.wait(0.1):
+            checkStreamDeck()
             if(inst.isConnected()):
                 isConn.set("Connected to bot") 
             else:
@@ -30,7 +31,9 @@ class updateVars(Thread):
                 if "main thread is not in" not in str(e):
                     messagebox.showerror("Error!", "Uh Oh! An error occurred: \n" + str(e))
                     on_closing()
-
+def checkStreamDeck():
+    if("StreamDeck.exe" in (i.name() for i in psutil.process_iter())):
+            messagebox.showerror("Error!", "Close StreamDeck Before Use")
 
 
 # Generates a custom tile with run-time generated text and custom image via the
@@ -155,5 +158,7 @@ if __name__ == '__main__':
     # Execute Tkinter
     stopFlag = Event()
     thread = updateVars(stopFlag)
+
+    
     thread.start()
     root.mainloop()
