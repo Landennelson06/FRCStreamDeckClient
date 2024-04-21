@@ -2,27 +2,13 @@
 
 Client to use a stream deck on a FRC Robot. Uses NetworkTables4
 
-
-
 In the future, i plan to add:
 
-* UI for images
+* [ ] UI for images
 
-* Robot-side code for complete ease-of-use
+* [ ] Multiple Stream decks
 
-* Multiple Stream decks
-
-* Maybe make it look pretty
-
-Expect a build soon (in the next 2 weeks)
-
-  
-
-### Help! Landen forgot about this project, what do i do?
-
-If I happen to do this, and you're unable to use a build, you need to modify the wanted images in the assets folder with what you would like,  put the dll in the `DLL` folder with your python executable (weird i know, but it's not my library), and make robot code that intercepts the key number.
-
-
+ 
 
 ### Help! The code is ugly, what is the stack?
 
@@ -30,4 +16,28 @@ The stack is the [python-elgato-streamdeck](https://github.com/abcminiuser/pytho
 
 ### I want to build the application myself
 
-Great! Here's an install line for all the dependencies `pip3 install pyntcore streamdeck pillow`
+Great! Here's an install line for all the dependencies `pip3 install pyntcore streamdeck pillow psutil pyinstaller`, and run `pyinstaller mainWindow.spec`, and your build will be in the `dist` folder. 
+
+### How do I use this?
+
+Download the latest build from the releases tab on Github. Extract and open. Change assets using the `Open Assets Folder` button on the UI as needed. In your RobotContainer, add this method:
+
+```java  
+private void configureStreamDeck(){
+    NetworkTableInstance inst = NetworkTableInstance.getDefault();
+    NetworkTable table = inst.getTable("StreamDeckData");
+    IntegerSubscriber data = table.getIntegerTopic("true").subscribe(0);
+    new Trigger(()->Math.toIntExact(data.get()) == 1)
+      .onTrue(intakeout);
+    new Trigger(()->Math.toIntExact(data.get()) == 7)
+      .onTrue(handoff);
+  }
+```
+
+Change the triggers as needed, and run this method on RobotContainer construction. 
+
+
+
+### I want to use a Stream Deck XL/Mini/etc
+
+Check the [python-elgato-streamdeck](https://github.com/abcminiuser/python-elgato-streamdeck) library. If it supports it, the only thing this application will need is more/less assets with the correct index name.  
