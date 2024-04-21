@@ -20,7 +20,7 @@ Great! Here's an install line for all the dependencies `pip3 install pyntcore st
 
 ### How do I use this?
 
-    Download the latest build from the releases tab on Github. Extract and open. Change assets using the `Open Assets Folder` button on the UI as needed. In your RobotContainer, add this method:
+Download the latest build from the releases tab on Github. Extract and open. Change assets using the `Open Assets Folder` button on the UI as needed. In your RobotContainer, add this method:
 
 ```java  
 private void configureStreamDeck(){
