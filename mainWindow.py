@@ -10,7 +10,7 @@ from PIL import Image, ImageDraw, ImageFont
 import psutil 
 ASSETS_PATH = os.path.join(os.path.dirname(__file__), "assets")
 ICON_PATH = os.path.join(os.path.dirname(__file__), "ico")
-VERSON_NO = "0.15a"
+VERSON_NO = "0.2a"
 class updateVars(Thread):
     def __init__(self, event):
         Thread.__init__(self)
@@ -120,9 +120,11 @@ def key_change_callback(deck, key, state):
         key_style = get_key_style(deck, key, state)
 def on_closing():
     print("Closing")
+    root.withdraw()
     stopFlag.set()
     root.quit()
-    root.destroy()
+def openAssets():
+    os.startfile(ASSETS_PATH)
 root = Tk()
 root.protocol("WM_DELETE_WINDOW", on_closing)
 if __name__ == '__main__':
@@ -160,6 +162,13 @@ if __name__ == '__main__':
     verLabel = Label(root, text=VERSON_NO)
     verLabel.place(x=350, y=200,anchor=SE)
 
+    fileLocation = Button(root, text="Open Assets Folder", command= openAssets  )
+    reloadAssets = Button(root, text="Reload assets", command= loadStreamDeck)
+
+    # fileLocation.place(x=50, y=150,anchor=NW)
+    # reloadAssets.place(x=300, y=150,anchor=NW)
+    fileLocation.pack()
+    reloadAssets.pack()
     # all widgets will be here
     # Execute Tkinter
     stopFlag = Event()
